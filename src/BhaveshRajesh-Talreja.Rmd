@@ -1,0 +1,35 @@
+---
+title: "Market Basket Analysis"
+author: "Bhavesh Rajesh Talreja"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+  html_document:
+    toc: yes
+    df_print: paged
+---
+
+#### First of all, we will use the python script on products.csv to generate the canonical transaction files for our analysis.
+
+### Required library imports and reading data files.
+
+```{r}
+
+#clearing the existing data from the environment.
+rm(list=ls())
+
+library("arules")
+library("arulesViz")
+
+tr.1k  <- read.transactions("tr-1k-canonical.csv" , sep=",")
+tr.5k  <- read.transactions("tr-5k-canonical.csv" , sep=",")
+tr.20k <- read.transactions("tr-20k-canonical.csv", sep=",")
+tr.75k <- read.transactions("tr-75k-canonical.csv", sep=",")
+
+tr.1k
+tr.5k
+tr.20k
+tr.75k
+
+```
