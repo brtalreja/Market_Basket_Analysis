@@ -33,7 +33,7 @@ tr.20k
 tr.75k
 
 ```
-### Now, we will mine the frequent itemsets and association rules using arules and arulesViz.
+### Frequent itemsets and Association rules mining.
 
 ```{r}
 
@@ -118,6 +118,8 @@ inspect(tail(sort(freq_IS_75k, descending=T, by="count")))
 #### From the above inspect table of 20K transaction dataset, we can observe that the least frequently purchased itemset is {Green Tea, Lemon Cookie, Lemon Lemonade, Raspberry Cookie, Raspberry Lemonade} with a support value of 0.020 and count value of 408.
 #### From the above inspect table of 75K transaction dataset, we can observe that the least frequently purchased itemset is {Apple Croissant, Apple Danish, Apple Tart, Cherry Soda} with a support value of 0.021 and count value of 1544.
 
+### Data Visualization.
+
 ```{r}
 
 itemFrequencyPlot(tr.1k, topN=10, type="absolute", main="Top 10 Frequent Items - 1k Transactions")
@@ -125,5 +127,19 @@ itemFrequencyPlot(tr.5k, topN=10, type="absolute", main="Top 10 Frequent Items -
 itemFrequencyPlot(tr.20k, topN=10, type="absolute", main="Top 10 Frequent Items - 20k Transactions")
 itemFrequencyPlot(tr.75k, topN=10, type="absolute", main="Top 10 Frequent Items - 75k Transactions")
 
+```
+
+```{r}
+
+plot(rules_1k, measure=c("support", "confidence"), shading="lift")
+plot(rules_5k, measure=c("support", "confidence"), shading="lift")
+plot(rules_20k, measure=c("support", "confidence"), shading="lift")
+plot(rules_75k, measure=c("support", "confidence"), shading="lift")
 
 ```
+
+#### COMMENT: Product Placement Optimization: Items frequently bought together should be placed near each other. This reduces the effort required for customers to find related items, enhancing their shopping experience and potentially increasing sales.
+#### Marketing and Promotion Strategies: Using the clusters, we can make more informed marketing strategies. For example, if certain items are often bought together, we can bundle them in promotions or highlight them in advertisements to attract customers.
+#### Inventory Management: Understanding item associations also helps in inventory management.
+#### Customer Experience Enhancement: By providing a seamless shopping experience where related items are easily accessible, customer satisfaction can be improved. This not only increases sales but also fosters customer loyalty.
+
