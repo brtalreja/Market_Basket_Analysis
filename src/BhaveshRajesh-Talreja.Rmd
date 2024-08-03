@@ -22,10 +22,10 @@ rm(list=ls())
 library("arules")
 library("arulesViz")
 
-tr.1k  <- read.transactions("tr-1k-canonical.csv" , sep=",")
-tr.5k  <- read.transactions("tr-5k-canonical.csv" , sep=",")
-tr.20k <- read.transactions("tr-20k-canonical.csv", sep=",")
-tr.75k <- read.transactions("tr-75k-canonical.csv", sep=",")
+tr.1k  <- read.transactions("../data/tr-1k-canonical.csv" , sep=",")
+tr.5k  <- read.transactions("../data/tr-5k-canonical.csv" , sep=",")
+tr.20k <- read.transactions("../data/tr-20k-canonical.csv", sep=",")
+tr.75k <- read.transactions("../data/tr-75k-canonical.csv", sep=",")
 
 tr.1k
 tr.5k
@@ -33,3 +33,57 @@ tr.20k
 tr.75k
 
 ```
+### Now, we will mine the frequent itemsets and association rules using arules and arulesViz.
+
+```{r}
+
+summary(tr.1k)
+summary(tr.5k)
+summary(tr.20k)
+summary(tr.75k)
+
+#COMMENT: As observed, minimum support is 0.1 and minimum confidence is 0.8.
+# We can try multiple values for support to observe and analyze:
+# The support value of 0.001 took immeasurable time to run. so, we will try with 0.01.
+# The confidence value of 0.9 to find good association rules.
+
+# Frequent Itemsets for all transaction datasets.
+# Inspect shows the required output i.e. All items in it described by the product name and along with it, the support of that itemset.
+
+freq_IS_1k <- apriori(tr.1k, parameter=list(support=0.01,target="frequent itemsets"))
+inspect(sort(freq_IS_1k, decreasing=T, by="count"))
+
+freq_IS_5k <- apriori(tr.5k, parameter=list(support=0.01,target="frequent itemsets"))
+inspect(sort(freq_IS_5k, decreasing=T, by="count"))
+
+freq_IS_20k <- apriori(tr.20k, parameter=list(support=0.01,target="frequent itemsets"))
+inspect(sort(freq_IS_20k, decreasing=T, by="count"))
+
+freq_IS_75k <- apriori(tr.75k, parameter=list(support=0.01,target="frequent itemsets"))
+inspect(sort(freq_IS_75k, decreasing=T, by="count"))
+
+#Association Rules mining for all transaction datasets. Inspect shows the required output i.e. for each rule: the antecedent, the consequent, the support of the rule, the confidence of the rule.
+rules_1k <- apriori(tr.1k, parameter=list(support=0.01,confidence=0.9))
+summary(rules_1k)
+inspect(sort(rules_1k, decreasing=T, by="confidence"))
+
+rules_5k <- apriori(tr.5k, parameter=list(support=0.01,confidence=0.9))
+summary(rules_5k)
+inspect(sort(rules_5k, decreasing=T, by="confidence"))
+
+rules_20k <- apriori(tr.20k, parameter=list(support=0.01,confidence=0.9))
+summary(rules_20k)
+inspect(sort(rules_20k, decreasing=T, by="confidence"))
+
+rules_75k <- apriori(tr.75k, parameter=list(support=0.01,confidence=0.9))
+summary(rules_75k)
+inspect(sort(rules_75k, decreasing=T, by="confidence"))
+
+```
+
+#### COMMENT: On comparing the rules for each transaction dataset, we can make the following observations:
+#### For 1k transaction dataset: number of rules = 68, mean support = 0.025, mean confidence = 0.966, mean lift = 13.10.
+#### For 5k transaction dataset: number of rules = 70, mean support = 0.026, mean confidence = 0.952, mean lift = 13.25.
+#### For 20k transaction dataset: number of rules = 70, mean support = 0.024, mean confidence = 0.949, mean lift = 13.19.
+#### For 75k transaction dataset: number of rules = 73, mean support = 0.025, mean confidence = 0.946, mean lift = 13.15.
+#### Based on these observations, it can be concluded that number of transactions does not affect much the values of number of rules, support, confidence, and lift as the mean values lie around 68 to 73, 0.024 to 0.026, 0.94 to 0.97, and  13.10 to 13.25 respectively.
