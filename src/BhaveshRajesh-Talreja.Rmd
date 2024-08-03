@@ -87,3 +87,43 @@ inspect(sort(rules_75k, decreasing=T, by="confidence"))
 #### For 20k transaction dataset: number of rules = 70, mean support = 0.024, mean confidence = 0.949, mean lift = 13.19.
 #### For 75k transaction dataset: number of rules = 73, mean support = 0.025, mean confidence = 0.946, mean lift = 13.15.
 #### Based on these observations, it can be concluded that number of transactions does not affect much the values of number of rules, support, confidence, and lift as the mean values lie around 68 to 73, 0.024 to 0.026, 0.94 to 0.97, and  13.10 to 13.25 respectively.
+
+```{r}
+
+inspect(head(sort(freq_IS_1k, descending=T, by="count")))
+inspect(head(sort(freq_IS_5k, descending=T, by="count")))
+inspect(head(sort(freq_IS_20k, descending=T, by="count")))
+inspect(head(sort(freq_IS_75k, descending=T, by="count")))
+
+```
+
+#### COMMENT: 
+#### From the above inspect table of 1K transaction dataset, we can observe that the most frequently purchased itemset is {Gongolais Cookie} with a support value of 0.108 and count value of 108.
+#### From the above inspect table of 5K transaction dataset, we can observe that the most frequently purchased itemset is {Coffee Eclair} with a support value of 0.111 and count value of 554.
+#### From the above inspect table of 20K transaction dataset, we can observe that the most frequently purchased itemset is {Coffee Eclair} with a support value of 0.110 and count value of 2197.
+#### From the above inspect table of 75K transaction dataset, we can observe that the most frequently purchased itemset is {Coffee Eclair} with a support value of 0.109 and count value of 8193.
+
+```{r}
+
+inspect(tail(sort(freq_IS_1k, descending=T, by="count")))
+inspect(tail(sort(freq_IS_5k, descending=T, by="count")))
+inspect(tail(sort(freq_IS_20k, descending=T, by="count")))
+inspect(tail(sort(freq_IS_75k, descending=T, by="count")))
+
+```
+
+#### COMMENT: 
+#### From the above inspect table of 1K transaction dataset, we can observe that the least frequently purchased itemset is {Apple Croissant, Truffle Cake} with a support value of 0.010 and count value of 10.
+#### From the above inspect table of 5K transaction dataset, we can observe that the least frequently purchased itemset is {Green Tea, Lemon Cookie, Lemon Lemonade, Raspberry Cookie, Raspberry Lemonade} with a support value of 0.021 and count value of 106.
+#### From the above inspect table of 20K transaction dataset, we can observe that the least frequently purchased itemset is {Green Tea, Lemon Cookie, Lemon Lemonade, Raspberry Cookie, Raspberry Lemonade} with a support value of 0.020 and count value of 408.
+#### From the above inspect table of 75K transaction dataset, we can observe that the least frequently purchased itemset is {Apple Croissant, Apple Danish, Apple Tart, Cherry Soda} with a support value of 0.021 and count value of 1544.
+
+```{r}
+
+itemFrequencyPlot(tr.1k, topN=10, type="absolute", main="Top 10 Frequent Items - 1k Transactions")
+itemFrequencyPlot(tr.5k, topN=10, type="absolute", main="Top 10 Frequent Items - 5k Transactions")
+itemFrequencyPlot(tr.20k, topN=10, type="absolute", main="Top 10 Frequent Items - 20k Transactions")
+itemFrequencyPlot(tr.75k, topN=10, type="absolute", main="Top 10 Frequent Items - 75k Transactions")
+
+
+```
