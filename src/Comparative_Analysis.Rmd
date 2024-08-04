@@ -50,7 +50,6 @@ kmeans_5k <- kmeans(binary_matrix_5k, centers = 13)
 kmeans_20k <- kmeans(binary_matrix_20k, centers = 13)
 kmeans_75k <- kmeans(binary_matrix_75k, centers = 13)
 
-# Add cluster information to the data
 transactions_clustered_1k <- data.frame(binary_matrix_1k, cluster = kmeans_1k$cluster)
 transactions_clustered_5k <- data.frame(binary_matrix_5k, cluster = kmeans_5k$cluster)
 transactions_clustered_20k <- data.frame(binary_matrix_20k, cluster = kmeans_20k$cluster)
