@@ -138,7 +138,8 @@ plot(rules_75k, measure=c("support", "confidence"), shading="lift")
 
 ```
 
-#### COMMENT: Product Placement Optimization: Items frequently bought together should be placed near each other. This reduces the effort required for customers to find related items, enhancing their shopping experience and potentially increasing sales.
+#### COMMENT:
+#### Product Placement Optimization: Items frequently bought together should be placed near each other. This reduces the effort required for customers to find related items, enhancing their shopping experience and potentially increasing sales.
 #### Marketing and Promotion Strategies: Using the clusters, we can make more informed marketing strategies. For example, if certain items are often bought together, we can bundle them in promotions or highlight them in advertisements to attract customers.
 #### Inventory Management: Understanding item associations also helps in inventory management.
 #### Customer Experience Enhancement: By providing a seamless shopping experience where related items are easily accessible, customer satisfaction can be improved. This not only increases sales but also fosters customer loyalty.

@@ -1,0 +1,139 @@
+---
+title: "Market Basket Analysis And K-means clustering comparison"
+author: "Bhavesh Rajesh Talreja"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+  html_document:
+    toc: yes
+    df_print: paged
+---
+
+
+```{r}
+
+#clearing the existing data from the environment.
+rm(list=ls())
+
+library("arules")
+library("arulesViz")
+library("dplyr")
+library("tidyr")
+
+tr.1k  <- read.transactions("../data/tr-1k-canonical.csv" , sep=",")
+tr.5k  <- read.transactions("../data/tr-5k-canonical.csv" , sep=",")
+tr.20k <- read.transactions("../data/tr-20k-canonical.csv", sep=",")
+tr.75k <- read.transactions("../data/tr-75k-canonical.csv", sep=",")
+
+```
+
+```{r}
+
+#To use the transactional data for k-means clustering, we will have to convert it into binary matrix data.
+binary_matrix_1k <- as(tr.1k, "matrix")
+binary_matrix_5k <- as(tr.5k, "matrix")
+binary_matrix_20k <- as(tr.20k, "matrix")
+binary_matrix_75k <- as(tr.75k, "matrix")
+
+
+set.seed(123)
+
+#To determine the optimal number of clusters, we will use the wss plot.
+wss <- (nrow(binary_matrix_1k) - 1) * sum(apply(binary_matrix_1k, 2, var))
+for (i in 2:15) wss[i] <- sum(kmeans(binary_matrix_1k, centers = i)$tot.withinss)
+plot(1:15, wss, type = "b", xlab = "Number of Clusters", ylab = "Within groups sum of squares")
+
+#We will use 13 clusters as suggested by the plot.
+kmeans_1k <- kmeans(binary_matrix_1k, centers = 13)
+kmeans_5k <- kmeans(binary_matrix_5k, centers = 13)
+kmeans_20k <- kmeans(binary_matrix_20k, centers = 13)
+kmeans_75k <- kmeans(binary_matrix_75k, centers = 13)
+
+# Add cluster information to the data
+transactions_clustered_1k <- data.frame(binary_matrix_1k, cluster = kmeans_1k$cluster)
+transactions_clustered_5k <- data.frame(binary_matrix_5k, cluster = kmeans_5k$cluster)
+transactions_clustered_20k <- data.frame(binary_matrix_20k, cluster = kmeans_20k$cluster)
+transactions_clustered_75k <- data.frame(binary_matrix_75k, cluster = kmeans_75k$cluster)
+
+```
+
+```{r}
+
+#Now that we have formed the clusters, we want the most frequent items in the clusters.
+get_cluster_frequent_items <- function(cluster_data) {
+  cluster_frequent_items <- cluster_data %>%
+    group_by(cluster) %>%
+    summarise(across(everything(), ~ sum(.x))) %>%
+    pivot_longer(-cluster, names_to = "item", values_to = "count") %>%
+    group_by(cluster) %>%
+    top_n(10, wt = count) %>%
+    arrange(cluster, desc(count))
+  return(cluster_frequent_items)
+}
+
+#We will get the most frequent itemsets from all the clusters.
+cluster_frequent_items_1k <- get_cluster_frequent_items(transactions_clustered_1k)
+cluster_frequent_items_5k <- get_cluster_frequent_items(transactions_clustered_5k)
+cluster_frequent_items_20k <- get_cluster_frequent_items(transactions_clustered_20k)
+cluster_frequent_items_75k <- get_cluster_frequent_items(transactions_clustered_75k)
+
+print(head(arrange(cluster_frequent_items_1k, desc(count)), 6))
+print(head(arrange(cluster_frequent_items_5k, desc(count)), 6))
+print(head(arrange(cluster_frequent_items_20k, desc(count)), 6))
+print(head(arrange(cluster_frequent_items_75k, desc(count)), 6))
+
+```
+
+```{r}
+
+#Generating frequent items from market basket analysis.
+freq_IS_1k <- apriori(tr.1k, parameter=list(support=0.01,target="frequent itemsets"))
+freq_IS_5k <- apriori(tr.5k, parameter=list(support=0.01,target="frequent itemsets"))
+freq_IS_20k <- apriori(tr.20k, parameter=list(support=0.01,target="frequent itemsets"))
+freq_IS_75k <- apriori(tr.75k, parameter=list(support=0.01,target="frequent itemsets"))
+
+inspect(head(sort(freq_IS_1k, decreasing = TRUE, by = "count")))
+inspect(head(sort(freq_IS_5k, decreasing = TRUE, by = "count")))
+inspect(head(sort(freq_IS_20k, decreasing = TRUE, by = "count")))
+inspect(head(sort(freq_IS_75k, decreasing = TRUE, by = "count")))
+
+```
+
+
+#### COMMENTS:
+#### Insights from Market Basket Analysis:
+#### Top items in 1k transactions: Gongolais Cookie, Truffle Cake, Tuile Cookie, Berry Tart, Hot Coffee, Coffee Eclair
+#### Top items in 5k transactions: Coffee Eclair, Hot Coffee, Tuile Cookie, Strawberry Cake, Gongolais Cookie, Orange Juice
+#### Top items in 20k transactions: Coffee Eclair, Hot Coffee, Tuile Cookie, Apricot Danish, Orange Juice, Strawberry Cake
+#### Top items in 75k transactions: Coffee Eclair, Hot Coffee, Tuile Cookie, Cherry Tart, Strawberry Cake, Apricot Danish
+#### 
+#### Insights from K-means Clustering:
+#### Top items in 1k transactions: Tuile.Cookie, Gongolais.Cookie, Strawberry.Cake, Truffle.Cake, Orange.Juice, Napoleon.Cake
+#### Top items in 5k transactions: Tuile.Cookie, Strawberry.Cake, Lemon.Cake, Berry.Tart, Cherry.Tart, Apricot.Danish
+#### Top items in 20k transactions: Gongolais.Cookie, Lemon.Cake, Strawberry.Cake, Orange.Juice, Berry.Tart, Cherry.Tart
+#### Top items in 75k transactions: Coffee.Eclair, Tuile.Cookie, Strawberry.Cake, Gongolais.Cookie, Berry.Tart, Orange.Juice
+#### 
+#### Comparative Insights:
+#### Common Items in both methods:
+#### Coffee Eclair: Consistently appears as the top item in both methods for larger datasets (20k and 75k transactions).
+#### Tuile Cookie, Strawberry Cake, and Gongolais Cookie: Frequently appear in the top items in both methods.
+#### Orange Juice and Berry Tart: Common in the top items, especially in larger datasets.
+#### 
+#### Support and Count Correlation:
+#### Items with high support and count in market basket analysis tend to form significant clusters in K-means clustering.
+#### For example, Coffee Eclair has the highest count and appears as a prominent item in clusters for larger datasets.
+#### 
+#### Consistency Across Dataset Sizes:
+#### For smaller datasets (1k transactions), there's some variation in the items. However, as the dataset size increases, the results from both methods become more consistent.
+#### Larger datasets (20k and 75k transactions) show a strong agreement in identifying the most frequent items.
+#### 
+#### Conclusion:
+#### Both market basket analysis and K-means clustering generate similar insights, particularly for larger datasets. They both identify key items that frequently appear in transactions. K-means clustering adds value by grouping items into clusters, which can help in understanding item associations and customer purchasing behavior more comprehensively.
+#### 
+#### Recommendations:
+#### [1] We can use market basket analysis to identify top items and their support and K-means clustering to group items and understand deeper associations.
+#### [2] Items like Coffee Eclair, Tuile Cookie, Strawberry Cake, and Gongolais Cookie should be focused more for marketing and inventory decisions, as these items are consistently frequent across both methods and various dataset sizes.
+#### [3] We can use the clusters formed by K-means to understand item groupings and design bundle offers or cross-promotion strategies.
+#### 
+#### By leveraging the strengths of both methods, we can gain a more comprehensive understanding of the transactional data and make informed business decisions.
